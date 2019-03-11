@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
+import 'package:miicha_app/screen/login_page.dart';
 
 void main() {
   // Enable integration testing with the Flutter Driver extension.
@@ -60,6 +61,9 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return LoginPage();
+      }));
     });
   }
 
