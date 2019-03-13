@@ -33,7 +33,7 @@
 **/android/captures/
 **/android/gradlew
 **/android/gradlew.bat
-**/android/local.properties
+**/android/**/local.properties
 **/android/**/GeneratedPluginRegistrant.java
 
 # iOS/XCode related
@@ -71,3 +71,4 @@
 
 # Firebase
 **/ios/Runner/GoogleService-Info.plist
+**/android/app/google-services.json
