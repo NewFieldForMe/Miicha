@@ -14,15 +14,54 @@ class _LoginPageState extends State<LoginPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
+  void initState() {
+    super.initState();
+    _auth.currentUser().then((user) {
+      setState(() {
+        _user = user;
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('ログイン')),
       body: Container(
-        child: _user == null
-            ? _buildGoogleSignInButton()
-            : Text(_user.displayName),
+        child: _user == null ? _buildGoogleSignInButton() : _userInfoScreen(),
       ),
     );
+  }
+
+  Widget _userInfoScreen() {
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          CircleAvatar(
+            maxRadius: 60,
+            backgroundImage: NetworkImage(_user.photoUrl),
+          ),
+          const SizedBox(height: 24),
+          Text(_user.displayName),
+          const SizedBox(height: 8),
+          Text(_user.email),
+          const SizedBox(height: 32),
+          RaisedButton(
+            child: const Text('SignOut'),
+            onPressed: () {
+              _auth.signOut().then((_) {
+                setState(() {
+                  _googleSignIn.signOut();
+                  _user = null;
+                });
+              }).catchError(print);
+            },
+          ),
+          const SizedBox(height: 32),
+        ],
+      )
+    ]);
   }
 
   /// GoogleLoginを実行するボタンのWidgetを作成する
@@ -47,8 +86,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<FirebaseUser> _handleSignIn() async {
     final googleUser = await _googleSignIn.signIn();
-    final googleAuth =
-        await googleUser.authentication;
+    final googleAuth = await googleUser.authentication;
 
     final credential = GoogleAuthProvider.getCredential(
       accessToken: googleAuth.accessToken,
