@@ -1,26 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:rxdart/rxdart.dart';
+
+class AuthenticationBloc {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final _userController = BehaviorSubject<FirebaseUser>(sync: true);
+  ValueObservable<FirebaseUser> get currentUser => _userController;
+
+  void handleSignIn() async {
+    final googleUser = await _googleSignIn.signIn();
+    final googleAuth = await googleUser.authentication;
+
+    final credential = GoogleAuthProvider.getCredential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    final user = await _auth.signInWithCredential(credential);
+    _userController.add(user);
+  }
+
+  void getCurrentUser() {
+    _auth.currentUser().then(_userController.add);
+  }
+
+  void signOut() {
+    _auth.signOut().then((_) {
+      _googleSignIn.signOut();
+      _userController.add(null);
+    }).catchError(print);
+  }
+
+  void dispose() {
+    _userController.close();
+  }
+}
 
 class LoginPage extends StatefulWidget {
+  /// NOTE: staticにしないと、ログイン後に画面更新がなされない
+  static AuthenticationBloc bloc = AuthenticationBloc();
+
   @override
   _LoginPageState createState() => new _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  /// 現在ログインしているユーザー
-  FirebaseUser _user;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
   @override
   void initState() {
     super.initState();
-    _auth.currentUser().then((user) {
-      setState(() {
-        _user = user;
-      });
-    });
+    LoginPage.bloc.getCurrentUser();
   }
 
   @override
@@ -28,12 +58,19 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('ログイン')),
       body: Container(
-        child: _user == null ? _buildGoogleSignInButton() : _userInfoScreen(),
+        child: StreamBuilder<FirebaseUser>(
+          stream: LoginPage.bloc.currentUser,
+          initialData: LoginPage.bloc.currentUser.value,
+          builder: (context, snapshot) {
+            return snapshot.data == null 
+            ? _buildGoogleSignInButton() 
+            : _userInfoScreen(snapshot.data);
+          }),
       ),
     );
   }
 
-  Widget _userInfoScreen() {
+  Widget _userInfoScreen(FirebaseUser _user) {
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
       Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -76,12 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: const Text('サインアウトする'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  _auth.signOut().then((_) {
-                    setState(() {
-                      _googleSignIn.signOut();
-                      _user = null;
-                    });
-                  }).catchError(print);
+                  LoginPage.bloc.signOut();
                 },
               ),
             ],
@@ -97,29 +129,11 @@ class _LoginPageState extends State<LoginPage> {
         Center(
             child: RaisedButton(
           child: const Text('Google Sign In'),
-          onPressed: () {
-            _handleSignIn().then((user) {
-              setState(() {
-                _user = user;
-              });
-            }).catchError(print);
+          onPressed: () { 
+            LoginPage.bloc.handleSignIn(); 
           },
         )),
       ],
     );
-  }
-
-  Future<FirebaseUser> _handleSignIn() async {
-    final googleUser = await _googleSignIn.signIn();
-    final googleAuth = await googleUser.authentication;
-
-    final credential = GoogleAuthProvider.getCredential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-
-    final user = await _auth.signInWithCredential(credential);
-    print('signed in $user.displayName');
-    return user;
   }
 }

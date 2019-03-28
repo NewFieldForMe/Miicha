@@ -29,6 +29,9 @@ dependencies:
   google_sign_in: ^4.0.1+1
   firebase_analytics: ^2.0.3
 
+  # others
+  rxdart: ^0.21.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
