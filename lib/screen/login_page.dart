@@ -6,8 +6,12 @@ import 'package:rxdart/rxdart.dart';
 class AuthenticationBloc {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final _userController = BehaviorSubject<FirebaseUser>(sync: true);
+  final _userController = BehaviorSubject<FirebaseUser>();
   ValueObservable<FirebaseUser> get currentUser => _userController;
+
+  AuthenticationBloc() {
+    _auth.onAuthStateChanged.pipe(_userController);
+  }
 
   void handleSignIn() async {
     final googleUser = await _googleSignIn.signIn();
@@ -18,8 +22,7 @@ class AuthenticationBloc {
       idToken: googleAuth.idToken,
     );
 
-    final user = await _auth.signInWithCredential(credential);
-    _userController.add(user);
+    await _auth.signInWithCredential(credential);
   }
 
   void getCurrentUser() {
@@ -39,7 +42,7 @@ class AuthenticationBloc {
 }
 
 class LoginPage extends StatefulWidget {
-  AuthenticationBloc bloc = AuthenticationBloc();
+  final AuthenticationBloc bloc = AuthenticationBloc();
 
   @override
   _LoginPageState createState() => new _LoginPageState();
