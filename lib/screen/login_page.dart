@@ -39,8 +39,7 @@ class AuthenticationBloc {
 }
 
 class LoginPage extends StatefulWidget {
-  /// NOTE: staticにしないと、ログイン後に画面更新がなされない
-  static AuthenticationBloc bloc = AuthenticationBloc();
+  AuthenticationBloc bloc = AuthenticationBloc();
 
   @override
   _LoginPageState createState() => new _LoginPageState();
@@ -50,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    LoginPage.bloc.getCurrentUser();
+    widget.bloc.getCurrentUser();
   }
 
   @override
@@ -59,8 +58,8 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(title: const Text('ログイン')),
       body: Container(
         child: StreamBuilder<FirebaseUser>(
-          stream: LoginPage.bloc.currentUser,
-          initialData: LoginPage.bloc.currentUser.value,
+          stream: widget.bloc.currentUser,
+          initialData: widget.bloc.currentUser.value,
           builder: (context, snapshot) {
             return snapshot.data == null 
             ? _buildGoogleSignInButton() 
@@ -113,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: const Text('サインアウトする'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  LoginPage.bloc.signOut();
+                  widget.bloc.signOut();
                 },
               ),
             ],
@@ -130,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
             child: RaisedButton(
           child: const Text('Google Sign In'),
           onPressed: () { 
-            LoginPage.bloc.handleSignIn(); 
+            widget.bloc.handleSignIn(); 
           },
         )),
       ],
