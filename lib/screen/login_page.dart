@@ -1,58 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:rxdart/rxdart.dart';
-
-class AuthenticationBloc {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final _userController = BehaviorSubject<FirebaseUser>();
-  ValueObservable<FirebaseUser> get currentUser => _userController;
-
-  AuthenticationBloc() {
-    _auth.onAuthStateChanged.pipe(_userController);
-  }
-
-  void handleSignIn() async {
-    final googleUser = await _googleSignIn.signIn();
-    final googleAuth = await googleUser.authentication;
-
-    final credential = GoogleAuthProvider.getCredential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-
-    await _auth.signInWithCredential(credential);
-  }
-
-  void getCurrentUser() {
-    _auth.currentUser().then(_userController.add);
-  }
-
-  void signOut() {
-    _auth.signOut().then((_) {
-      _googleSignIn.signOut();
-      _userController.add(null);
-    }).catchError(print);
-  }
-
-  void dispose() {
-    _userController.close();
-  }
-}
+import 'package:miicha_app/bloc/authentication_bloc.dart';
+import 'package:bloc_provider/bloc_provider.dart';
 
 class LoginPage extends StatefulWidget {
-  final AuthenticationBloc bloc = AuthenticationBloc();
-
   @override
   _LoginPageState createState() => new _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
+  AuthenticationBloc bloc;
   @override
   void initState() {
     super.initState();
-    widget.bloc.getCurrentUser();
+    bloc = BlocProvider.of<AuthenticationBloc>(context)
+      ..getCurrentUser();
   }
 
   @override
@@ -61,8 +23,8 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(title: const Text('ログイン')),
       body: Container(
         child: StreamBuilder<FirebaseUser>(
-          stream: widget.bloc.currentUser,
-          initialData: widget.bloc.currentUser.value,
+          stream: bloc.currentUser,
+          initialData: bloc.currentUser.value,
           builder: (context, snapshot) {
             return snapshot.data == null 
             ? _buildGoogleSignInButton() 
@@ -115,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: const Text('サインアウトする'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  widget.bloc.signOut();
+                  bloc.signOut();
                 },
               ),
             ],
@@ -132,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
             child: RaisedButton(
           child: const Text('Google Sign In'),
           onPressed: () { 
-            widget.bloc.handleSignIn(); 
+            bloc.handleSignIn();
           },
         )),
       ],

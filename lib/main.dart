@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
+import 'package:bloc_provider/bloc_provider.dart';
 import 'package:miicha_app/screen/login_page.dart';
+import 'package:miicha_app/bloc/authentication_bloc.dart';
 
 void main() {
   // Enable integration testing with the Flutter Driver extension.
   // See https://flutter.io/testing/ for more info.
   enableFlutterDriverExtension();
-  runApp(MyApp());
+  runApp(
+    BlocProvider<AuthenticationBloc>(
+      creator: (_context, _bag) => AuthenticationBloc(),
+      child: MyApp(),
+      )
+    );
 }
 
 class MyApp extends StatelessWidget {

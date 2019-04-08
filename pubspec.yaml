@@ -31,6 +31,7 @@ dependencies:
 
   # others
   rxdart: ^0.21.0
+  bloc_provider: ^0.5.0+3
 
 dev_dependencies:
   flutter_test:
