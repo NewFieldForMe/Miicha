@@ -29,31 +29,16 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       drawer: HomePageDrawer(),
-      /// Todo: flatingActionButtonをログイン状態で切り分けるのをもう少し綺麗に実装したい
-      floatingActionButton: StreamBuilder<FirebaseUser>(
-          stream: bloc.currentUser,
-          initialData: bloc.currentUser.value,
-          builder: (context, snapshot) {
-            if (snapshot.data == null) {
-              return FloatingActionButton(
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return LoginPage();
-                  }));
-                },
-                child: const Icon(Icons.add),
-              );
-            } else {
-              return FloatingActionButton(
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return PostPage();
-                  }));
-                },
-                child: const Icon(Icons.add),
-              );
-            }
-          }),
-      );
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return bloc.authState == AuthenticationState.signOut
+              ? LoginPage()
+              : PostPage();
+            }));
+          },
+          child: const Icon(Icons.add),
+      )
+    );
   }
 }

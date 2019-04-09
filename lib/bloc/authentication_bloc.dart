@@ -4,15 +4,23 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:bloc_provider/bloc_provider.dart';
 
+enum AuthenticationState { signIn, signOut }
+
 class AuthenticationBloc implements Bloc {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  AuthenticationState authState = AuthenticationState.signOut;
 
   final _userController = BehaviorSubject<FirebaseUser>();
   ValueObservable<FirebaseUser> get currentUser => _userController;
 
   AuthenticationBloc() {
     _auth.onAuthStateChanged.pipe(_userController);
+    _userController.listen((user) {
+      authState = user == null
+      ? AuthenticationState.signOut
+      : AuthenticationState.signIn;
+    });
   }
 
   void handleSignIn() async {
