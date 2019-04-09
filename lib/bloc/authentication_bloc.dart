@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:rxdart/rxdart.dart';
@@ -30,7 +31,34 @@ class AuthenticationBloc implements Bloc {
     _auth.currentUser();
   }
 
-  void signOut() {
+  // サインアウトの確認ダイアログを表示する
+  void showConfirmSignOutDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('サインアウト'),
+            content: const Text('サインアウトすると、アプリのいくつかの機能が使用できなくなります。'),
+            actions: <Widget>[
+              FlatButton(
+                child: const Text('サインアウトしない'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                child: const Text('サインアウトする'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _signOut();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void _signOut() {
     _auth.signOut().then((_) {
       _googleSignIn.signOut();
     }).catchError(print);

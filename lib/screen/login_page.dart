@@ -50,39 +50,14 @@ class _LoginPageState extends State<LoginPage> {
           const SizedBox(height: 32),
           RaisedButton(
             child: const Text('SignOut'),
-            onPressed: (_showConfirmSignOutDialog),
+            onPressed: () {
+              bloc.showConfirmSignOutDialog(context);
+            },
           ),
           const SizedBox(height: 32),
         ],
       )
     ]);
-  }
-
-  // サインアウトの確認ダイアログを表示する
-  void _showConfirmSignOutDialog() {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('サインアウト'),
-            content: const Text('サインアウトすると、アプリのいくつかの機能が使用できなくなります。'),
-            actions: <Widget>[
-              FlatButton(
-                child: const Text('サインアウトしない'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              FlatButton(
-                child: const Text('サインアウトする'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  bloc.signOut();
-                },
-              ),
-            ],
-          );
-        });
   }
 
   /// GoogleLoginを実行するボタンのWidgetを作成する
