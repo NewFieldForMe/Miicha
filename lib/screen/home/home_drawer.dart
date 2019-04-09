@@ -58,9 +58,24 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          const DrawerHeader(
-            child: const Text('ログインしています'),
-            decoration: BoxDecoration(color: Colors.blue),
+          DrawerHeader(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                CircleAvatar(
+                  maxRadius: 32,
+                  backgroundImage: NetworkImage(user.photoUrl),
+                ),
+                const SizedBox(height: 8),
+                Text(user.displayName, style: TextStyle(color: Colors.white),),
+              ],
+            ),
+            decoration: const BoxDecoration(color: Colors.blue),
+            ),
+            ListTile(
+              title: const Text('プロフィール'),
+              onTap: () { },
             ),
             ListTile(
               title: const Text('ログアウト'),
