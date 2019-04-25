@@ -50,7 +50,7 @@ class _PostFormState extends State<PostForm> {
       padding: const EdgeInsets.all(16),
       child: TextFormField(
         keyboardType: TextInputType.multiline,
-        maxLength: 140,
+        maxLength: 100,
         maxLines: null,
       ),
     );
