@@ -7,7 +7,7 @@ import 'package:miicha_app/screen/home/home_page.dart';
 void main() {
   // Enable integration testing with the Flutter Driver extension.
   // See https://flutter.io/testing/ for more info.
-  enableFlutterDriverExtension();
+  // enableFlutterDriverExtension();
   runApp(
     BlocProvider<AuthenticationBloc>(
       creator: (_context, _bag) => AuthenticationBloc(),
