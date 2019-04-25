@@ -10,7 +10,12 @@ class _PostPageState extends State<PostPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('投稿する')),
-      body: PostForm(),
+      //　GestureDetectorを使い、ソフトウェアキーボードが表示されている時に、
+      // 入力領域以外をタップされたらキーボードを閉じる
+      body: GestureDetector(
+        onTap: () { FocusScope.of(context).requestFocus(FocusNode()); },
+        child: PostForm(),
+      )
     );
   }
 }
