@@ -9,7 +9,7 @@ class _PostPageState extends State<PostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('投稿する')),
+      appBar: AppBar(title: const Text('記事を作る')),
       //　GestureDetectorを使い、ソフトウェアキーボードが表示されている時に、
       // 入力領域以外をタップされたらキーボードを閉じる
       body: GestureDetector(
