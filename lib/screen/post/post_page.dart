@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:miicha_app/screen/image_picker/image_picker_page.dart';
 
 class PostPage extends StatefulWidget {
   @override
@@ -39,9 +40,26 @@ class _PostFormState extends State<PostForm> {
   Widget _buildScrollableListForm() {
     return ListView(
       children: <Widget>[
+        _buildCameraButton(),
         _buildTextField(),
         _buildSubmitButton()
       ],
+    );
+  }
+
+  Widget _buildCameraButton() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+        child: Center(
+          child: RaisedButton(
+            color: Theme.of(context).primaryColorLight,
+            child: const Text('撮影する'),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return ImagePickerPage();
+              }));
+            },
+        ),)
     );
   }
 

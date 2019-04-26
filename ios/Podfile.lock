@@ -11,7 +11,7 @@ PODS:
     - Firebase/Core
     - Flutter
   - firebase_auth (0.0.1):
-    - Firebase/Auth (~> 5.19)
+    - Firebase/Auth
     - Firebase/Core
     - Flutter
   - firebase_core (0.0.1):
@@ -80,6 +80,8 @@ PODS:
   - GoogleUtilities/UserDefaults (5.8.0):
     - GoogleUtilities/Logger
   - GTMSessionFetcher/Core (1.2.1)
+  - image_picker (0.0.1):
+    - Flutter
   - nanopb (0.3.901):
     - nanopb/decode (= 0.3.901)
     - nanopb/encode (= 0.3.901)
@@ -92,6 +94,7 @@ DEPENDENCIES:
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - Flutter (from `.symlinks/flutter/ios`)
   - google_sign_in (from `.symlinks/plugins/google_sign_in/ios`)
+  - image_picker (from `.symlinks/plugins/image_picker/ios`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -119,11 +122,13 @@ EXTERNAL SOURCES:
     :path: ".symlinks/flutter/ios"
   google_sign_in:
     :path: ".symlinks/plugins/google_sign_in/ios"
+  image_picker:
+    :path: ".symlinks/plugins/image_picker/ios"
 
 SPEC CHECKSUMS:
   Firebase: 0c8cf33f266410c61ab3e2265cfa412200351d9c
   firebase_analytics: 06fd3e199bfbc003a9949b90f3e3c6332fa1299e
-  firebase_auth: 47c17cb3efbdfa541c9ecfec1a3c092f66c6c568
+  firebase_auth: a5b249720380ab4ee1c633368cbb84aac9959359
   firebase_core: c96aa8b2fcf7f5167d32f22034f502f9304952b8
   FirebaseAnalytics: ece1aa57a4f43c64d53a648b5a5e05151aae947b
   FirebaseAuth: dd7bbf03a5aee0eafb3a1aee4d2812bd74bac890
@@ -137,6 +142,7 @@ SPEC CHECKSUMS:
   GoogleToolboxForMac: ff31605b7d66400dcec09bed5861689aebadda4d
   GoogleUtilities: 04fce34bcd5620c1ee76fb79172105c74a4df335
   GTMSessionFetcher: 32aeca0aa144acea523e1c8e053089dec2cb98ca
+  image_picker: 86b84c4fe89267356a1f17297a45b5d317ebd2e7
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
 
 PODFILE CHECKSUM: ebd43b443038e611b86ede96e613bd6033c49497
