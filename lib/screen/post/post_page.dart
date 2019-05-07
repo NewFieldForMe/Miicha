@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:miicha_app/screen/image_picker/image_picker_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PostPage extends StatefulWidget {
   @override
@@ -28,6 +29,7 @@ class PostForm extends StatefulWidget {
 
 class _PostFormState extends State<PostForm> {
   final _formKey = GlobalKey<FormState>();
+  final Article _data = Article();
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +72,9 @@ class _PostFormState extends State<PostForm> {
         keyboardType: TextInputType.multiline,
         maxLength: 100,
         maxLines: null,
+        onSaved: (value) {
+          _data.message = value;
+        },
       ),
     );
   }
@@ -81,8 +86,20 @@ class _PostFormState extends State<PostForm> {
           child: RaisedButton(
             color: Theme.of(context).primaryColorLight,
             child: const Text('投稿する'),
-            onPressed: () {},
+            onPressed: _submit,
         ),)
     );
   }
+
+  void _submit() {
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save(); // Save our form now.
+      Firestore.instance.collection('articles').document()
+        .setData({ 'message': _data.message });
+    }
+  }
+}
+
+class Article {
+  String message;
 }
