@@ -94,12 +94,17 @@ class _PostFormState extends State<PostForm> {
   void _submit() {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save(); // Save our form now.
+      _data.createDateTime = DateTime.now();
       Firestore.instance.collection('articles').document()
-        .setData({ 'message': _data.message });
+        .setData({
+          'message': _data.message,
+          'createDateTime': _data.createDateTime
+        });
     }
   }
 }
 
 class Article {
   String message;
+  DateTime createDateTime;
 }
