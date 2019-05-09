@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:miicha_app/screen/image_picker/image_picker_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:miicha_app/screen/image_picker/image_picker_page.dart';
+import 'package:miicha_app/model/article.dart';
 
 class PostPage extends StatefulWidget {
   @override
@@ -102,9 +103,4 @@ class _PostFormState extends State<PostForm> {
         });
     }
   }
-}
-
-class Article {
-  String message;
-  DateTime createDateTime;
 }
