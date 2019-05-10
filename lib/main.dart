@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
 import 'package:bloc_provider/bloc_provider.dart';
 import 'package:miicha_app/bloc/authentication_bloc.dart';
+import 'package:miicha_app/bloc/hud_bloc.dart';
 import 'package:miicha_app/screen/home/home_page.dart';
 
 void main() {
@@ -9,11 +10,14 @@ void main() {
   // See https://flutter.io/testing/ for more info.
   // enableFlutterDriverExtension();
   runApp(
-    BlocProvider<AuthenticationBloc>(
-      creator: (_context, _bag) => AuthenticationBloc(),
+    BlocProviderTree(
+      blocProviders: [
+        BlocProvider<AuthenticationBloc>(creator: (_context, _bag) => AuthenticationBloc()),
+        BlocProvider<HUDBloc>(creator: (_context, _bag) => HUDBloc()),
+      ],
       child: MyApp(),
-      )
-    );
+    )
+  );
 }
 
 class MyApp extends StatelessWidget {
