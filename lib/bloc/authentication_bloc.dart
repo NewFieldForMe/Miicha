@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:bloc_provider/bloc_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum AuthenticationState { signIn, signOut }
 
@@ -32,7 +33,23 @@ class AuthenticationBloc implements Bloc {
       idToken: googleAuth.idToken,
     );
 
-    await _auth.signInWithCredential(credential);
+    await _auth.signInWithCredential(credential)
+      .then((user) {
+        // ユーザーテーブルに存在しなければ登録する
+        Firestore.instance.collection('users')
+          .where('uid', isEqualTo: user.uid)
+          .getDocuments()
+          .then((ds) {
+            if (ds.documents.isEmpty) {
+              Firestore.instance.collection('users').document()
+                .setData({
+                  'uid': user.uid,
+                  'nick_name': user.displayName,
+                  'image_url': user.photoUrl
+                });
+            }
+          });
+        });
   }
 
   void getCurrentUser() {
