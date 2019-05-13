@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:miicha_app/bloc/authentication_bloc.dart';
 import 'package:bloc_provider/bloc_provider.dart';
+import 'package:miicha_app/model/user.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -22,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('ログイン')),
       body: Container(
-        child: StreamBuilder<FirebaseUser>(
+        child: StreamBuilder<User>(
           stream: bloc.currentUser,
           initialData: bloc.currentUser.value,
           builder: (context, snapshot) {
@@ -34,17 +34,17 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _userInfoScreen(FirebaseUser _user) {
+  Widget _userInfoScreen(User _user) {
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
       Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           CircleAvatar(
             maxRadius: 60,
-            backgroundImage: NetworkImage(_user.photoUrl),
+            backgroundImage: NetworkImage(_user.imageUrl),
           ),
           const SizedBox(height: 24),
-          Text(_user.displayName),
+          Text(_user.nickName),
           const SizedBox(height: 8),
           Text(_user.email),
           const SizedBox(height: 32),

@@ -4,6 +4,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:bloc_provider/bloc_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:miicha_app/model/user.dart';
 
 enum AuthenticationState { signIn, signOut }
 
@@ -12,16 +13,49 @@ class AuthenticationBloc implements Bloc {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   AuthenticationState authState = AuthenticationState.signOut;
 
-  final _userController = BehaviorSubject<FirebaseUser>();
-  ValueObservable<FirebaseUser> get currentUser => _userController;
+  final _userController = BehaviorSubject<User>();
+  ValueObservable<User> get currentUser => _userController;
+
+  // Todo: FirebaseUser -> Userのモデル変換のより良い方法を考える
+  final _firebaseUserController = BehaviorSubject<FirebaseUser>();
+  ValueObservable<FirebaseUser> get currentFirebaseUser => _firebaseUserController;
 
   AuthenticationBloc() {
-    _auth.onAuthStateChanged.pipe(_userController);
+    _auth.onAuthStateChanged
+      .pipe(_firebaseUserController);
     _userController.listen((user) {
       authState = user == null
       ? AuthenticationState.signOut
       : AuthenticationState.signIn;
     });
+    currentFirebaseUser.listen((firebaseUser) {
+      if (firebaseUser == null) { 
+        _userController.add(null); 
+        return;
+      }
+      _convertUser(firebaseUser);
+    });
+  }
+
+  Future _convertUser(FirebaseUser firebaseUser) {
+    return Firestore.instance.collection('users')
+          .where('uid', isEqualTo: firebaseUser.uid)
+          .getDocuments()
+          .then((ds) {
+            if (ds.documents.isEmpty) {
+              Firestore.instance.collection('users').document()
+                .setData({
+                  'uid': firebaseUser.uid,
+                  'nick_name': firebaseUser.displayName,
+                  'image_url': firebaseUser.photoUrl,
+                  'email': firebaseUser.email
+                });
+              return User(firebaseUser);
+            } else {
+              return User.fromDocumentSnapshot(ds.documents.first);
+            }
+          })
+          .then(_userController.add);
   }
 
   void handleSignIn() async {
@@ -33,23 +67,7 @@ class AuthenticationBloc implements Bloc {
       idToken: googleAuth.idToken,
     );
 
-    await _auth.signInWithCredential(credential)
-      .then((user) {
-        // ユーザーテーブルに存在しなければ登録する
-        Firestore.instance.collection('users')
-          .where('uid', isEqualTo: user.uid)
-          .getDocuments()
-          .then((ds) {
-            if (ds.documents.isEmpty) {
-              Firestore.instance.collection('users').document()
-                .setData({
-                  'uid': user.uid,
-                  'nick_name': user.displayName,
-                  'image_url': user.photoUrl
-                });
-            }
-          });
-        });
+    await _auth.signInWithCredential(credential);
   }
 
   void getCurrentUser() {
@@ -92,5 +110,6 @@ class AuthenticationBloc implements Bloc {
   @override
   void dispose() async{
     await _userController.close();
+    await _firebaseUserController.close();
   }
 }

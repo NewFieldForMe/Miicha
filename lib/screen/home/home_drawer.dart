@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bloc_provider/bloc_provider.dart';
 import 'package:miicha_app/screen/login_page.dart';
 import 'package:miicha_app/bloc/authentication_bloc.dart';
+import 'package:miicha_app/model/user.dart';
 
 class HomePageDrawer extends StatefulWidget {
   @override
@@ -21,7 +21,7 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<FirebaseUser>(
+    return StreamBuilder<User>(
       stream: bloc.currentUser,
       initialData: bloc.currentUser.value,
       builder: (context, snapshot) {
@@ -53,7 +53,7 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
     );
   }
 
-  Widget _buildLoginStateDrawer(FirebaseUser user) {
+  Widget _buildLoginStateDrawer(User user) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -65,10 +65,10 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
               children: <Widget>[
                 CircleAvatar(
                   maxRadius: 32,
-                  backgroundImage: NetworkImage(user.photoUrl),
+                  backgroundImage: NetworkImage(user.imageUrl),
                 ),
                 const SizedBox(height: 8),
-                Text(user.displayName, style: TextStyle(color: Colors.white),),
+                Text(user.nickName, style: TextStyle(color: Colors.white),),
               ],
             ),
             decoration: const BoxDecoration(color: Colors.blue),

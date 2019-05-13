@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:miicha_app/screen/login_page.dart';
 import 'package:miicha_app/screen/home/home_drawer.dart';
 import 'package:miicha_app/screen/post/post_page.dart';
