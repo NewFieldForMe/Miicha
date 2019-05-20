@@ -5,6 +5,7 @@ import 'package:miicha_app/screen/image_picker/image_picker_page.dart';
 import 'package:miicha_app/model/article.dart';
 import 'package:miicha_app/ui_parts/hud.dart';
 import 'package:miicha_app/bloc/hud_bloc.dart';
+import 'package:miicha_app/bloc/authentication_bloc.dart';
 
 class PostPage extends StatefulWidget {
   @override
@@ -39,12 +40,14 @@ class PostForm extends StatefulWidget {
 class _PostFormState extends State<PostForm> {
   final _formKey = GlobalKey<FormState>();
   final Article _data = Article();
-  HUDBloc bloc;
+  HUDBloc _hudBloc;
+  AuthenticationBloc _authBloc;
 
   @override
   void initState() {
     super.initState();
-    bloc = BlocProvider.of<HUDBloc>(context);
+    _hudBloc = BlocProvider.of<HUDBloc>(context);
+    _authBloc = BlocProvider.of<AuthenticationBloc>(context);
   }
 
   @override
@@ -109,18 +112,21 @@ class _PostFormState extends State<PostForm> {
 
   void _submit() {
     if (_formKey.currentState.validate()) {
-      bloc.showHUD();
+      _hudBloc.showHUD();
       _formKey.currentState.save(); // Save our form now.
       _data.createDateTime = DateTime.now();
-      Firestore.instance.collection('articles').document()
-        .setData({
-          'message': _data.message,
-          'createDateTime': _data.createDateTime
-        }).then((_) {
-          Navigator.of(context).pop();
-        }).catchError((error) {
-          // Todo: Snackbarを表示する
-        }).whenComplete(bloc.hideHUD);
+      _authBloc.currentUser.listen((user) {
+        Firestore.instance.collection('users').document(user.id)
+          .collection('articles').document()
+          .setData({
+            'message': _data.message,
+            'createDateTime': _data.createDateTime
+          }).then((_) {
+            Navigator.of(context).pop();
+          }).catchError((error) {
+            // Todo: Snackbarを表示する
+          }).whenComplete(_hudBloc.hideHUD);
+      });
     }
   }
 }

@@ -39,13 +39,13 @@ class AuthenticationBloc implements Bloc {
 
   Future _convertUser(FirebaseUser firebaseUser) {
     return Firestore.instance.collection('users')
-          .where('uid', isEqualTo: firebaseUser.uid)
+          .where('id', isEqualTo: firebaseUser.uid)
           .getDocuments()
           .then((ds) {
             if (ds.documents.isEmpty) {
               Firestore.instance.collection('users').document()
                 .setData({
-                  'uid': firebaseUser.uid,
+                  'id': firebaseUser.uid,
                   'nick_name': firebaseUser.displayName,
                   'image_url': firebaseUser.photoUrl,
                   'email': firebaseUser.email
