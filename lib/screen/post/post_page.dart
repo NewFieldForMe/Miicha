@@ -1,7 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:bloc_provider/bloc_provider.dart';
-import 'package:miicha_app/screen/image_picker/image_picker_page.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:miicha_app/model/article.dart';
 import 'package:miicha_app/ui_parts/hud.dart';
 import 'package:miicha_app/bloc/hud_bloc.dart';
@@ -42,6 +43,15 @@ class _PostFormState extends State<PostForm> {
   final Article _data = Article();
   HUDBloc _hudBloc;
   AuthenticationBloc _authBloc;
+  File _image;
+
+  Future getImage(ImageSource source) async {
+    final image = await ImagePicker.pickImage(source: source);
+
+    setState(() {
+      _image = image;
+    });
+  }
 
   @override
   void initState() {
@@ -61,11 +71,24 @@ class _PostFormState extends State<PostForm> {
   Widget _buildScrollableListForm() {
     return ListView(
       children: <Widget>[
-        _buildCameraButton(),
+        _buildImageView(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+          _buildCameraButton(),
+          _buildGalleryButton(),
+        ],),
         _buildTextField(),
         _buildSubmitButton()
       ],
     );
+  }
+
+  Widget _buildImageView() {
+    return Center(child: _image == null
+    ? const Text('No image selected')
+    : Image.file(_image)
+    ,);
   }
 
   Widget _buildCameraButton() {
@@ -75,10 +98,22 @@ class _PostFormState extends State<PostForm> {
           child: RaisedButton(
             color: Theme.of(context).primaryColorLight,
             child: const Text('撮影する'),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return ImagePickerPage();
-              }));
+            onPressed: () => {
+              getImage(ImageSource.camera)
+            },
+        ),)
+    );
+  }
+
+  Widget _buildGalleryButton() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+        child: Center(
+          child: RaisedButton(
+            color: Theme.of(context).primaryColorLight,
+            child: const Text('Galleryから選択する'),
+            onPressed: () => {
+              getImage(ImageSource.gallery)
             },
         ),)
     );
