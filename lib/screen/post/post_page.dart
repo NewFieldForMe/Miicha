@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:bloc_provider/bloc_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:miicha_app/model/article.dart';
@@ -43,6 +45,10 @@ class _PostFormState extends State<PostForm> {
   final Article _data = Article();
   HUDBloc _hudBloc;
   AuthenticationBloc _authBloc;
+  final FirebaseStorage _storage = FirebaseStorage(
+    app: FirebaseApp.instance,
+    storageBucket: 'gs://miicha-dev.appspot.com'
+    );
   File _image;
 
   Future getImage(ImageSource source) async {
@@ -148,19 +154,29 @@ class _PostFormState extends State<PostForm> {
   void _submit() {
     if (_formKey.currentState.validate()) {
       _hudBloc.showHUD();
-      _formKey.currentState.save(); // Save our form now.
-      _data.createDateTime = DateTime.now();
-      _authBloc.currentUser.listen((user) {
-        Firestore.instance.collection('users').document(user.id)
-          .collection('articles').document()
-          .setData({
-            'message': _data.message,
-            'createDateTime': _data.createDateTime
-          }).then((_) {
-            Navigator.of(context).pop();
-          }).catchError((error) {
-            // Todo: Snackbarを表示する
-          }).whenComplete(_hudBloc.hideHUD);
+      final hash = _image.hashCode;
+      final ref = _storage.ref().child('img').child('$hash.jpeg');
+      final uploadTask = ref.putFile(_image);
+      StorageTaskSnapshot storageTaskSnapshot;
+      uploadTask.onComplete.then((snapshot) {
+        storageTaskSnapshot = snapshot;
+        return storageTaskSnapshot.ref.getDownloadURL();
+      }).then((url) {
+        _formKey.currentState.save(); // Save our form now.
+        _data.createDateTime = DateTime.now();
+        _authBloc.currentUser.listen((user) {
+          Firestore.instance.collection('users').document(user.id)
+            .collection('articles').document()
+            .setData({
+              'message': _data.message,
+              'imageUrl': url as String,
+              'createDateTime': _data.createDateTime
+            }).then((_) {
+              Navigator.of(context).pop();
+            }).catchError((error) {
+              // Todo: Snackbarを表示する
+            }).whenComplete(_hudBloc.hideHUD);
+        });
       });
     }
   }

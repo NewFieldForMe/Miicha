@@ -5,6 +5,7 @@ import 'package:miicha_app/screen/post/post_page.dart';
 import 'package:miicha_app/bloc/authentication_bloc.dart';
 import 'package:bloc_provider/bloc_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key key,}) : super(key: key);
@@ -43,9 +44,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _loader(BuildContext context, String url) {
+    return new Center(
+      child: const CircularProgressIndicator(),
+    );
+  }
+
   Widget _buildArticleList() {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('articles').snapshots(),
+      stream: Firestore.instance.collection('articles').orderBy('createDateTime', descending: true).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
@@ -55,8 +62,22 @@ class _HomePageState extends State<HomePage> {
           default:
           return ListView(
             children: snapshot.data.documents.map( (document) {
-              return ListTile(
-                title: Text(document['message'] as String),
+              return Card(
+                elevation: 4,
+                margin: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    CachedNetworkImage(
+                      // placeholder: _loader,
+                      imageUrl: document['imageUrl'] as String,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(document['message'] as String)
+                    )
+                  ],
+                )
               );
             }).toList(),
           );

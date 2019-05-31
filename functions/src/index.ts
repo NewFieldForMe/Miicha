@@ -5,6 +5,7 @@ const firestore = admin.firestore();
 
 interface Article {
     readonly message: String;
+    readonly imageUrl: String;
     readonly createDateTime: Date;
 }
 
