@@ -68,9 +68,16 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    CachedNetworkImage(
-                      // placeholder: _loader,
-                      imageUrl: document['imageUrl'] as String,
+                    SizedBox(child:
+                      Align(
+                        alignment: Alignment.center,
+                        child: CachedNetworkImage(
+                          height: 480,
+                          fit: BoxFit.fitHeight,
+                          placeholder: _loader,
+                          imageUrl: document['imageUrl'] as String,
+                        ),
+                      )
                     ),
                     Padding(
                       padding: const EdgeInsets.all(16),
