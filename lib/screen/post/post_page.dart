@@ -1,6 +1,5 @@
 import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:image/image.dart' as Im;
+import 'package:image/image.dart' as _im;
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -158,13 +157,12 @@ class _PostFormState extends State<PostForm> {
   }
 
   void _submit() {
-
     if (_formKey.currentState.validate()) {
       _hudBloc.showHUD();
       final hash = _image.hashCode;
       final ref = _storage.ref().child('img').child('$hash.jpeg');
       final uploadTask = ref.putFile(_image);
-      final imageData = Im.decodeImage(_image.readAsBytesSync());
+      final imageData = _im.decodeImage(_image.readAsBytesSync());
 
       StorageTaskSnapshot storageTaskSnapshot;
       uploadTask.onComplete.then((snapshot) {
@@ -185,11 +183,21 @@ class _PostFormState extends State<PostForm> {
             }).then((_) {
               Navigator.of(context).pop();
             }).catchError((error) {
-              // Todo: Snackbarを表示する
+              _showSnackbarPostError();
               print(error);
             }).whenComplete(_hudBloc.hideHUD);
         });
-      });
+      }).catchError((error) {
+        _showSnackbarPostError();
+        print(error);
+      }).whenComplete(_hudBloc.hideHUD);
     }
+  }
+
+  void _showSnackbarPostError() {
+    Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('投稿に失敗しました。時間をおいて再度お試しください。'),)
+    );
   }
 }
