@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       drawer: HomePageDrawer(),
@@ -45,9 +46,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _loader(BuildContext context, String url) {
+    // return Container(height: 480,);
     return new Center(
       child: const CircularProgressIndicator(),
     );
+  }
+
+  double calculateImageHeight({double imageWidth, double imageHeight}) {
+    final _t = (imageHeight / imageWidth) * MediaQuery.of(context).size.width;
+    return _t;
   }
 
   Widget _buildArticleList() {
@@ -72,8 +79,10 @@ class _HomePageState extends State<HomePage> {
                       Align(
                         alignment: Alignment.center,
                         child: CachedNetworkImage(
-                          height: 480,
                           fit: BoxFit.fitHeight,
+                          height: calculateImageHeight(
+                            imageWidth: (document['imageWidth'] as int).toDouble(),
+                            imageHeight: (document['imageHeight'] as int).toDouble()),
                           placeholder: _loader,
                           imageUrl: document['imageUrl'] as String,
                         ),

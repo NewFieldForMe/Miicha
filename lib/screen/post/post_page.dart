@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:image/image.dart' as Im;
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -52,7 +54,11 @@ class _PostFormState extends State<PostForm> {
   File _image;
 
   Future getImage(ImageSource source) async {
-    final image = await ImagePicker.pickImage(source: source);
+    final image = await ImagePicker.pickImage(
+      source: source,
+      maxHeight: 640,
+      maxWidth: 640
+      );
 
     setState(() {
       _image = image;
@@ -152,11 +158,14 @@ class _PostFormState extends State<PostForm> {
   }
 
   void _submit() {
+
     if (_formKey.currentState.validate()) {
       _hudBloc.showHUD();
       final hash = _image.hashCode;
       final ref = _storage.ref().child('img').child('$hash.jpeg');
       final uploadTask = ref.putFile(_image);
+      final imageData = Im.decodeImage(_image.readAsBytesSync());
+
       StorageTaskSnapshot storageTaskSnapshot;
       uploadTask.onComplete.then((snapshot) {
         storageTaskSnapshot = snapshot;
@@ -169,12 +178,15 @@ class _PostFormState extends State<PostForm> {
             .collection('articles').document()
             .setData({
               'message': _data.message,
-              'imageUrl': url as String,
+              'imageUrl': url,
+              'imageHeight': imageData.height,
+              'imageWidth': imageData.width,
               'createDateTime': _data.createDateTime
             }).then((_) {
               Navigator.of(context).pop();
             }).catchError((error) {
               // Todo: Snackbarを表示する
+              print(error);
             }).whenComplete(_hudBloc.hideHUD);
         });
       });
