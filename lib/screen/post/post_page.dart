@@ -51,6 +51,7 @@ class _PostFormState extends State<PostForm> {
     storageBucket: 'gs://miicha-dev.appspot.com'
     );
   File _image;
+  _im.Image _imageData;
 
   Future getImage(ImageSource source) async {
     final image = await ImagePicker.pickImage(
@@ -61,6 +62,7 @@ class _PostFormState extends State<PostForm> {
 
     setState(() {
       _image = image;
+      _imageData = _im.decodeImage(_image.readAsBytesSync());
     });
   }
 
@@ -162,13 +164,21 @@ class _PostFormState extends State<PostForm> {
       final hash = _image.hashCode;
       final ref = _storage.ref().child('img').child('$hash.jpeg');
       final uploadTask = ref.putFile(_image);
-      final imageData = _im.decodeImage(_image.readAsBytesSync());
+      _storage.setMaxUploadRetryTimeMillis(2000).then((value) {
+      });
 
       StorageTaskSnapshot storageTaskSnapshot;
+
       uploadTask.onComplete.then((snapshot) {
-        storageTaskSnapshot = snapshot;
-        return storageTaskSnapshot.ref.getDownloadURL();
-      }).then((url) {
+        if (snapshot.error != null) {
+          print(snapshot.error);
+          throw new Error();
+        } else {
+          storageTaskSnapshot = snapshot;
+          return storageTaskSnapshot.ref.getDownloadURL();
+        }
+      })
+      .then((url) {
         _formKey.currentState.save(); // Save our form now.
         _data.createDateTime = DateTime.now();
         _authBloc.currentUser.listen((user) {
@@ -177,8 +187,8 @@ class _PostFormState extends State<PostForm> {
             .setData({
               'message': _data.message,
               'imageUrl': url,
-              'imageHeight': imageData.height,
-              'imageWidth': imageData.width,
+              'imageHeight': _imageData.height,
+              'imageWidth': _imageData.width,
               'createDateTime': _data.createDateTime
             }).then((_) {
               Navigator.of(context).pop();

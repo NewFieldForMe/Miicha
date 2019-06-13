@@ -69,8 +69,7 @@ class _HomePageState extends State<HomePage> {
           default:
           return ListView(
             children: snapshot.data.documents.map( (document) {
-              return Card(
-                elevation: 4,
+              return Container(
                 margin: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,14 +77,17 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(child:
                       Align(
                         alignment: Alignment.center,
-                        child: CachedNetworkImage(
-                          fit: BoxFit.fitHeight,
-                          height: calculateImageHeight(
-                            imageWidth: (document['imageWidth'] as int).toDouble(),
-                            imageHeight: (document['imageHeight'] as int).toDouble()),
-                          placeholder: _loader,
-                          imageUrl: document['imageUrl'] as String,
-                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: CachedNetworkImage(
+                            fit: BoxFit.fitHeight,
+                            height: calculateImageHeight(
+                              imageWidth: (document['imageWidth'] as int).toDouble(),
+                              imageHeight: (document['imageHeight'] as int).toDouble()),
+                            placeholder: _loader,
+                            imageUrl: document['imageUrl'] as String,
+                          ),
+                        )
                       )
                     ),
                     Padding(
