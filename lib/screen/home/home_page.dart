@@ -48,7 +48,10 @@ class _HomePageState extends State<HomePage> {
   Widget _loader(BuildContext context, String url) {
     // return Container(height: 480,);
     return new Center(
-      child: const CircularProgressIndicator(),
+      child: 
+      Container(
+        height: 200,
+        )
     );
   }
 
@@ -89,6 +92,10 @@ class _HomePageState extends State<HomePage> {
                           ),
                         )
                       )
+                      ,height: calculateImageHeight(
+                        imageWidth: (document['imageWidth'] as int).toDouble(),
+                        imageHeight: (document['imageHeight'] as int).toDouble()
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(16),

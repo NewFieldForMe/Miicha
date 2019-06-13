@@ -19,15 +19,30 @@ class PostPage extends StatefulWidget {
 class _PostPageState extends State<PostPage> {
   @override
   Widget build(BuildContext context) {
+    final _postform = PostForm();
     return Scaffold(
-      appBar: AppBar(title: const Text('記事を作る')),
+      appBar: AppBar(
+        title: const Text('記事を作る'),
+        actions: <Widget>[
+          const FlatButton(
+            // onPressed: _postform.submit,
+            color: Colors.transparent,
+            child: Text(
+              '投稿する',
+              style: TextStyle(
+                color: Colors.white
+              ),
+            ),
+          )
+        ],
+      ),
       // GestureDetectorを使い、ソフトウェアキーボードが表示されている時に、
       // 入力領域以外をタップされたらキーボードを閉じる
       body: GestureDetector(
         onTap: () { FocusScope.of(context).requestFocus(FocusNode()); },
         child: Stack(
           children: <Widget>[
-            PostForm(),
+            _postform,
             HUD(),
           ],
         )
@@ -109,9 +124,9 @@ class _PostFormState extends State<PostForm> {
       margin: const EdgeInsets.all(16),
       color: Colors.grey,
       height: 200,
-      child: Center(child: Text(
+      child: Center(child: const Text(
         '画像を選択してください',
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.white,
           fontSize: 18,
           fontWeight: FontWeight.bold
@@ -170,12 +185,12 @@ class _PostFormState extends State<PostForm> {
             color: Theme.of(context).primaryColorDark,
             textColor: Colors.white,
             child: const Text('投稿する'),
-            onPressed: _submit,
+            onPressed: submit,
         ),)
     );
   }
 
-  void _submit() {
+  void submit() {
     if (_formKey.currentState.validate()) {
       _hudBloc.showHUD();
       final hash = _image.hashCode;
