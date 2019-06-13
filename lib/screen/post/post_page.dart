@@ -84,6 +84,7 @@ class _PostFormState extends State<PostForm> {
   Widget _buildScrollableListForm() {
     return ListView(
       children: <Widget>[
+        _buildSubmitButton(),
         _buildImageView(),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -92,23 +93,38 @@ class _PostFormState extends State<PostForm> {
           _buildGalleryButton(),
         ],),
         _buildTextField(),
-        _buildSubmitButton()
       ],
     );
   }
 
   Widget _buildImageView() {
     return Center(child: _image == null
-    ? const Text('No image selected')
+    ? _buildEmptyImageView()
     : Image.file(_image)
     ,);
+  }
+
+  Widget _buildEmptyImageView() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      color: Colors.grey,
+      height: 200,
+      child: Center(child: Text(
+        '画像を選択してください',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.bold
+        ),
+      )),
+    );
   }
 
   Widget _buildCameraButton() {
     return Padding(
       padding: const EdgeInsets.all(16),
         child: Center(
-          child: RaisedButton(
+          child: OutlineButton(
             color: Theme.of(context).primaryColorLight,
             child: const Text('撮影する'),
             onPressed: () => {
@@ -122,7 +138,7 @@ class _PostFormState extends State<PostForm> {
     return Padding(
       padding: const EdgeInsets.all(16),
         child: Center(
-          child: RaisedButton(
+          child: OutlineButton(
             color: Theme.of(context).primaryColorLight,
             child: const Text('Galleryから選択する'),
             onPressed: () => {
@@ -151,7 +167,8 @@ class _PostFormState extends State<PostForm> {
       padding: const EdgeInsets.all(16),
         child: Center(
           child: RaisedButton(
-            color: Theme.of(context).primaryColorLight,
+            color: Theme.of(context).primaryColorDark,
+            textColor: Colors.white,
             child: const Text('投稿する'),
             onPressed: _submit,
         ),)
